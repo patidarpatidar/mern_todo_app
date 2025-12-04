@@ -46,9 +46,7 @@ export default function Dashboard() {
       }, INACTIVITY_TIMEOUT);
     };
 
-    // Track user activity
     const handleActivity = () => {
-      // Don't reset if warning is showing
       if (showLogoutWarning) return;
 
       setupInactivityTracking();

@@ -8,7 +8,7 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use((config) => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  console.log('[API] Token from storage:', token ? 'Present' : 'Missing');
+ 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

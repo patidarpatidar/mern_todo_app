@@ -18,7 +18,6 @@ export default function TodoList() {
         setTodos(response.todos || []);
       }
     } catch (err) {
-      setError('Failed to fetch tasks');
       console.error(err);
     } finally {
       setLoading(false);
@@ -28,9 +27,8 @@ export default function TodoList() {
   useEffect(() => {
     fetchTodos();
 
-    // Listen for todo added event
     const handleTodoAdded = (e) => {
-      // If the event carries the created todo, insert it locally to avoid another GET
+    
       try {
         const created = e?.detail;
         if (created && created.id) {
@@ -38,10 +36,8 @@ export default function TodoList() {
           return;
         }
       } catch (err) {
-        // continue to fetch if anything goes wrong
-      }
+        }
 
-      // Fallback: refresh full list
       fetchTodos();
     };
 
@@ -69,7 +65,6 @@ export default function TodoList() {
         )
       );
     } catch (err) {
-      console.error('[TodoList] Toggle error:', err);
       setError('Failed to update task');
     }
   };
@@ -91,17 +86,13 @@ export default function TodoList() {
     }
 
     try {
-      console.log('[TodoList] Saving todo:', { id: todo.id, text: editText, completed: todo.completed });
       const resp = await updateTodo(todo.id, editText, todo.completed);
-      console.log('[TodoList] Update response:', resp);
-      // update local list with returned data if present
       setTodos(
         todos.map((t) => (t.id === todo.id ? { ...t, todo: editText } : t))
       );
       setEditingId(null);
       setEditText('');
     } catch (err) {
-      console.error('[TodoList] Save edit error:', err.response || err.message);
       setError(err.response?.data?.message || 'Failed to save task');
     }
   };

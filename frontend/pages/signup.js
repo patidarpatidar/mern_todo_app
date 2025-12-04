@@ -79,11 +79,10 @@ export default function Signup() {
         } catch (e) {
           console.warn('Failed to persist auth in localStorage', e);
         }
-        // Initialize auth context from localStorage so user is set immediately
+       
         try {
           initializeAuth();
         } catch (e) {
-          console.warn('initializeAuth failed', e);
         }
         router.push('/dashboard');
         return;
@@ -92,7 +91,6 @@ export default function Signup() {
       setError(data?.message || 'Signup failed');
       setLoading(false);
     } catch (err) {
-      console.error('Signup error:', err.response?.data || err.message || err);
       setError(err.response?.data?.message || err.message || 'An error occurred');
       setLoading(false);
     }

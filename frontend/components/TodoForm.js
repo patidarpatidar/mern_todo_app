@@ -18,16 +18,12 @@ export default function TodoForm() {
 
     setLoading(true);
     try {
-      console.log('Adding todo:', todoText);
       const result = await addTodo(todoText);
-      console.log('Todo added successfully', result);
       setTodoText('');
 
-      // If API returned the created todo, include it in the event detail
       const created = result?.data || result;
       window.dispatchEvent(new CustomEvent('todoAdded', { detail: created }));
     } catch (err) {
-      console.error('Error adding todo:', err);
       setError(err.response?.data?.message || 'Failed to add task');
     } finally {
       setLoading(false);
