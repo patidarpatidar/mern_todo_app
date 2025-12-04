@@ -16,7 +16,6 @@ export const AuthProvider = ({ children }) => {
         const response = await loginAPI(username, password);
         
         if (response.success) {
-          // store token and user in localStorage for SPA usage
           localStorage.setItem('token', response.token);
           localStorage.setItem('user', JSON.stringify(response.user));
           setUser(response.user);
