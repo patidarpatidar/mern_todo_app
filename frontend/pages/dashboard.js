@@ -25,17 +25,14 @@ export default function Dashboard() {
     }
 
     const setupInactivityTracking = () => {
-      // Clear existing timers
       if (inactivityTimer.current) clearTimeout(inactivityTimer.current);
       if (warningTimer.current) clearTimeout(warningTimer.current);
       if (countdownInterval.current) clearInterval(countdownInterval.current);
 
-      // Set inactivity timeout
       inactivityTimer.current = setTimeout(() => {
         setShowLogoutWarning(true);
         setCountdownSeconds(60);
 
-        // Start countdown
         countdownInterval.current = setInterval(() => {
           setCountdownSeconds((prev) => {
             if (prev <= 1) {
@@ -51,7 +48,8 @@ export default function Dashboard() {
 
     // Track user activity
     const handleActivity = () => {
-      if (showLogoutWarning) return; // Don't reset if warning is showing
+      // Don't reset if warning is showing
+      if (showLogoutWarning) return;
 
       setupInactivityTracking();
     };
@@ -73,7 +71,7 @@ export default function Dashboard() {
       if (warningTimer.current) clearTimeout(warningTimer.current);
       if (countdownInterval.current) clearInterval(countdownInterval.current);
     };
-  }, [user, router, showLogoutWarning]);
+  }, [user, router]);
 
   const handleLogout = () => {
     if (countdownInterval.current) clearInterval(countdownInterval.current);
@@ -89,7 +87,6 @@ export default function Dashboard() {
     if (inactivityTimer.current) clearTimeout(inactivityTimer.current);
     if (warningTimer.current) clearTimeout(warningTimer.current);
 
-    // Trigger activity to reset timer
     const event = new MouseEvent('mousemove');
     window.dispatchEvent(event);
   };

@@ -1,23 +1,29 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Cookie from 'js-cookie';
 import { useAuth } from '../context/AuthContext';
 
 export default function Index() {
   const router = useRouter();
-  const { initializeAuth } = useAuth();
+  const { user, initializeAuth } = useAuth();
 
   useEffect(() => {
+    // Initialize auth from localStorage
     initializeAuth();
-    
-    // Redirect based on auth status
-    const token = Cookie.get('token');
-    if (token) {
+  }, []); // Only run once on mount
+
+  useEffect(() => {
+    // After user state is set, redirect
+    if (user) {
       router.push('/dashboard');
     } else {
-      router.push('/login');
+      // Check if we have a token but user isn't loaded yet (race condition)
+      // This can happen if initializeAuth() hasn't completed or user wasn't found
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      if (!token) {
+        router.push('/login');
+      }
     }
-  }, [router, initializeAuth]);
+  }, [user, router]);
 
   return <div></div>;
 }

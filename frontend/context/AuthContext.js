@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useCallback } from 'react';
-import Cookie from 'js-cookie';
 import { useRouter } from 'next/router';
 
 const AuthContext = createContext();
@@ -17,8 +16,9 @@ export const AuthProvider = ({ children }) => {
         const response = await loginAPI(username, password);
         
         if (response.success) {
-          Cookie.set('token', response.token, { expires: 1 });
-          Cookie.set('user', JSON.stringify(response.user), { expires: 1 });
+          // store token and user in localStorage for SPA usage
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('user', JSON.stringify(response.user));
           setUser(response.user);
           setLoading(false);
           return { success: true };
@@ -32,19 +32,23 @@ export const AuthProvider = ({ children }) => {
   );
 
   const logout = useCallback(() => {
-    Cookie.remove('token');
-    Cookie.remove('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setUser(null);
     router.push('/login');
   }, [router]);
 
   const initializeAuth = useCallback(() => {
-    const token = Cookie.get('token');
-    const userCookie = Cookie.get('user');
-    
-    if (token && userCookie) {
-      setUser(JSON.parse(userCookie));
-    } else {
+    try {
+      const token = localStorage.getItem('token');
+      const userCookie = localStorage.getItem('user');
+
+      if (token && userCookie) {
+        setUser(JSON.parse(userCookie));
+      } else {
+        setUser(null);
+      }
+    } catch (e) {
       setUser(null);
     }
   }, []);

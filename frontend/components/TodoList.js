@@ -6,6 +6,8 @@ export default function TodoList() {
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [editingId, setEditingId] = useState(null);
+  const [editText, setEditText] = useState('');
 
   const fetchTodos = async () => {
     setLoading(true);
@@ -27,7 +29,19 @@ export default function TodoList() {
     fetchTodos();
 
     // Listen for todo added event
-    const handleTodoAdded = () => {
+    const handleTodoAdded = (e) => {
+      // If the event carries the created todo, insert it locally to avoid another GET
+      try {
+        const created = e?.detail;
+        if (created && created.id) {
+          setTodos((prev) => [created, ...prev]);
+          return;
+        }
+      } catch (err) {
+        // continue to fetch if anything goes wrong
+      }
+
+      // Fallback: refresh full list
       fetchTodos();
     };
 
@@ -55,7 +69,40 @@ export default function TodoList() {
         )
       );
     } catch (err) {
+      console.error('[TodoList] Toggle error:', err);
       setError('Failed to update task');
+    }
+  };
+
+  const startEdit = (todo) => {
+    setEditingId(todo.id);
+    setEditText(todo.todo);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditText('');
+  };
+
+  const saveEdit = async (todo) => {
+    if (!editText.trim()) {
+      setError('Task text cannot be empty');
+      return;
+    }
+
+    try {
+      console.log('[TodoList] Saving todo:', { id: todo.id, text: editText, completed: todo.completed });
+      const resp = await updateTodo(todo.id, editText, todo.completed);
+      console.log('[TodoList] Update response:', resp);
+      // update local list with returned data if present
+      setTodos(
+        todos.map((t) => (t.id === todo.id ? { ...t, todo: editText } : t))
+      );
+      setEditingId(null);
+      setEditText('');
+    } catch (err) {
+      console.error('[TodoList] Save edit error:', err.response || err.message);
+      setError(err.response?.data?.message || 'Failed to save task');
     }
   };
 
@@ -82,13 +129,36 @@ export default function TodoList() {
                   onChange={() => handleToggle(todo)}
                   className={styles.checkbox}
                 />
-                <span
-                  className={`${styles.todoText} ${
-                    todo.completed ? styles.completed : ''
-                  }`}
-                >
-                  {todo.todo}
-                </span>
+
+                {editingId === todo.id ? (
+                  <>
+                    <input
+                      type="text"
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      className={styles.editInput}
+                    />
+                    <button onClick={() => saveEdit(todo)} className={styles.saveBtn}>
+                      Save
+                    </button>
+                    <button onClick={cancelEdit} className={styles.cancelBtn}>
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <span
+                      className={`${styles.todoText} ${
+                        todo.completed ? styles.completed : ''
+                      }`}
+                    >
+                      {todo.todo}
+                    </span>
+                    <button onClick={() => startEdit(todo)} className={styles.editBtn}>
+                      Edit
+                    </button>
+                  </>
+                )}
               </div>
               <button
                 onClick={() => handleDelete(todo.id)}
