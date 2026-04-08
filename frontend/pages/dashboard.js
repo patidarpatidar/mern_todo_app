@@ -5,7 +5,7 @@ import TodoList from '../components/TodoList';
 import TodoForm from '../components/TodoForm';
 import LogoutWarning from '../components/LogoutWarning';
 import styles from '../styles/Dashboard.module.css';
-
+// Inactivity timeout settings
 const INACTIVITY_TIMEOUT = 10 * 60 * 1000; // 10 minutes
 const WARNING_TIMEOUT = 60 * 1000; // 60 seconds
 
