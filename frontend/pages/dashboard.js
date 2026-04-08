@@ -8,7 +8,7 @@ import styles from '../styles/Dashboard.module.css';
 // Inactivity timeout settings
 const INACTIVITY_TIMEOUT = 10 * 60 * 1000; // 10 minutes
 const WARNING_TIMEOUT = 60 * 1000; // 60 seconds
-
+// Dashboard page component
 export default function Dashboard() {
   const router = useRouter();
   const { user, logout } = useAuth();
